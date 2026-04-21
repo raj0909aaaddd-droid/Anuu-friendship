@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Magic of Friendship</title>
+  <style>
+    /* === 1. CORE RESET === */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #020205; /* Deep void black */
+      color: #ffffff;
+      font-family: 'Times New Roman', serif;
+      overflow-x: hidden;
+      overscroll-behavior: none;
+    }
+
+    /* === 2. THE MATH CANVAS === */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0; /* Stays in the absolute background */
+      pointer-events: none;
+    }
+
+    /* === 3. SCROLL ARCHITECTURE === */
+    .scroll-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      /* Creates the massive scrolling space */
+      height: 400vh; 
+      z-index: 1;
+    }
+
+    /* === 4. CINEMATIC TYPOGRAPHY === */
+    .text-section {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 10%;
+    }
+
+    /* Positioning each block of text down the page */
+    #section-1 { top: 0vh; }
+    #section-2 { top: 100vh; }
+    #section-3 { top: 200vh; }
+    #section-4 { top: 300vh; }
+
+    .glow-text {
+      font-size: 1.8rem;
+      line-height: 1.6;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 0 20px rgba(147, 51, 234, 0.5), 0 0 40px rgba(147, 51, 234, 0.2);
+      opacity: 0; /* Hidden by default, JS will reveal it */
+      transform: translateY(50px);
+      transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1), transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .anuu-name {
+      font-size: 3.5rem;
+      font-weight: bold;
+      color: #c084fc; /* Radiant Purple */
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      text-shadow: 0 0 30px #c084fc, 0 0 60px #9333ea;
+      margin: 20px 0;
+      display: block;
+    }
+
+    /* JS adds this class when the text scrolls into the math viewport */
+    .visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="mathCanvas"></canvas>
+
+  <div class="scroll-container">
+    
+    <div class="text-section" id="section-1">
+      <h1 class="glow-text" style="font-size: 2.5rem; margin-bottom: 20px;">The Magic of Us</h1>
+      <p class="glow-text">
+        Friendship is that rare and beautiful magic that weaves through the fabric of our lives, turning the most ordinary moments into treasures we'll cherish forever.
+      </p>
+    </div>
+
+    <div class="text-section" id="section-2">
+      <p class="glow-text">
+        It offers a quiet, unshakeable strength that lifts us through the storms of hardship and amplifies every spark of joy into something radiant and shared.
+      </p>
+    </div>
+
+    <div class="text-section" id="section-3">
+      <p class="glow-text">
+        In my small world...
+        <span class="anuu-name">ANUU</span>
+        you hold a place so profound and unique that no one—not in the distant past, not in this present moment, and not in any endless future—could ever reach or claim it except you alone.
+      </p>
+    </div>
+
+    <div class="text-section" id="section-4">
+      <p class="glow-text">
+        You're the steady light in my chaos, the heartbeat of what matters most. Irreplaceable in ways that touch my soul deeply every single day, making every step of this journey feel complete just because you're by my side.
+      </p>
+    </div>
+
+  </div>
+
+  <script>
+    /* === THE PURE MATH ENGINE === */
+    const canvas = document.getElementById('mathCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let particles = [];
+    
+    // Dynamic resizing for mobile screens
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // The Particle Object
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        // Trigonometric velocity
+        this.angle = Math.random() * Math.PI * 2;
+        this.speed = Math.random() * 0.5 + 0.1;
+        this.vx = Math.cos(this.angle) * this.speed;
+        this.vy = Math.sin(this.angle) * this.speed;
+        this.radius = Math.random() * 2;
+      }
+
+      update(scrollOffset) {
+        this.x += this.vx;
+        // Moves the particles UP when you scroll DOWN (Parallax Math)
+        this.y += this.vy - (scrollOffset * 0.005); 
+
+        // Bounce off edges smoothly
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0) this.y = height;
+        if (this.y > height) this.y = 0;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(192, 132, 252, 0.8)';
+        ctx.fill();
+      }
+    }
+
+    // Generate 80 particles (Perfect amount for mobile performance)
+    for (let i = 0; i < 80; i++) {
+      particles.push(new Particle());
+    }
+
+    // --- LERP SCROLLING & ANIMATION LOOP ---
+    let currentScroll = 0;
+    let targetScroll = 0;
+
+    window.addEventListener('scroll', () => {
+      targetScroll = window.scrollY;
+    });
+
+    function renderEngine() {
+      // Math: Lerp equation for cinematic smoothing
+      currentScroll += (targetScroll - currentScroll) * 0.08;
+
+      // Clear the canvas every frame
+      ctx.clearRect(0, 0, width, height);
+
+      // Math: Distance Formula to draw the "Fabric"
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update(targetScroll - currentScroll);
+        particles[i].draw();
+
+        for (let j = i; j < particles.length; j++) {
+          let dx = particles[i].x - particles[j].x;
+          let dy = particles[i].y - particles[j].y;
+          let distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 120) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(147, 51, 234, ${1 - distance/120})`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Intersection Observer Logic (Checking if text is on screen)
+      const sections = document.querySelectorAll('.text-section');
+      sections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        const textElement = section.querySelector('.glow-text');
+        
+        // If the section enters the middle 60% of the screen, make it visible
+        if (rect.top < window.innerHeight * 0.8 && rect.bottom > window.innerHeight * 0.2) {
+          textElement.classList.add('visible');
+        } else {
+          // Removes it when scrolling away, creating a repeatable journey
+          textElement.classList.remove('visible');
+        }
+      });
+
+      // Loop the engine at 60 Frames Per Second
+      requestAnimationFrame(renderEngine);
+    }
+
+    // Start the engine
+    renderEngine();
+  </script>
+</body>
+  </html>
+  
