@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Tribute to Anuu</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,600&family=Space+Grotesk:wght@300;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* === 1. THE VOID (Base Reset) === */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body, html {
+      background-color: #030303;
+      color: #ffffff;
+      overflow-x: hidden;
+      /* Massive height to allow for deep Z-axis scrolling */
+      height: 500vh; 
+      overscroll-behavior: none;
+    }
+
+    /* === 2. PSYCHOLOGICAL FILM GRAIN === */
+    /* This adds that gritty, physical texture to the screen */
+    .grain-overlay {
+      position: fixed;
+      top: -50%; left: -50%; right: -50%; bottom: -50%;
+      width: 200%; height: 200%;
+      background: transparent url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+      opacity: 0.06;
+      pointer-events: none;
+      z-index: 9999;
+      animation: grain 8s steps(10) infinite;
+    }
+    @keyframes grain {
+      0%, 100% { transform: translate(0, 0); }
+      10% { transform: translate(-5%, -10%); }
+      30% { transform: translate(3%, -15%); }
+      50% { transform: translate(12%, 9%); }
+      70% { transform: translate(9%, 4%); }
+      90% { transform: translate(-1%, 7%); }
+    }
+
+    /* === 3. THE 3D SPATIAL VIEWPORT === */
+    /* This turns the browser into a 3D camera lens */
+    .viewport {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      perspective: 1200px; /* The depth of the 3D space */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    /* The "Camera" that moves forward through the space */
+    .camera {
+      width: 100%; height: 100%;
+      position: absolute;
+      transform-style: preserve-3d; /* Critical: allows objects to have Z-depth */
+    }
+
+    /* === 4. BRUTAL-ELEGANCE TYPOGRAPHY === */
+    .panel {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90vw;
+      max-width: 800px;
+      text-align: center;
+      /* Elements fade out slightly the further back they are */
+      opacity: 0; 
+      transition: opacity 0.5s ease;
+    }
+
+    .micro-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 2vh;
+    }
+
+    .massive-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 12vw; /* Scales massively on mobile */
+      line-height: 1.1;
+      font-weight: 400;
+      text-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+    }
+
+    .story-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      line-height: 1.6;
+      color: #d1d1d1;
+      font-style: italic;
+    }
+
+    .anuu-highlight {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 5rem;
+      font-weight: 700;
+      letter-spacing: -2px;
+      color: transparent;
+      -webkit-text-stroke: 1px #fff; /* Hollow text effect */
+      display: block;
+      margin: 20px 0;
+      position: relative;
+    }
+
+    /* The glowing accent behind the name */
+    .anuu-highlight::after {
+      content: 'ANUU';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      color: #b066ff;
+      filter: blur(20px);
+      z-index: -1;
+      opacity: 0.6;
+    }
+
+    /* === 5. THE FLOATING ARTIFACT (3D Object Proxy) === */
+    .artifact-container {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) translateZ(-4000px);
+    }
+    
+    .glass-artifact {
+      width: 200px; height: 200px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 0 30px rgba(176, 102, 255, 0.2), 0 0 50px rgba(176, 102, 255, 0.4);
+      animation: slowSpin 20s linear infinite;
+    }
+
+    @keyframes slowSpin {
+      0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+      100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="grain-overlay"></div>
+
+  <div class="viewport">
+    <div class="camera" id="camera">
+      
+      <div class="panel" id="panel-1" style="transform: translate(-50%, -50%) translateZ(0px);">
+        <p class="micro-text">Entry 001 // The Bond</p>
+        <h1 class="massive-text">RARE<br>MAGIC</h1>
+      </div>
+
+      <div class="panel" id="panel-2" style="transform: translate(-50%, -50%) translateZ(-1500px);">
+        <p class="story-text">
+          Friendship weaves through the fabric of our lives, turning the most ordinary moments into treasures we'll cherish forever.
+        </p>
+      </div>
+
+      <div class="panel" id="panel-3" style="transform: translate(-50%, -50%) translateZ(-3000px);">
+        <p class="story-text">In my small world...</p>
+        <span class="anuu-highlight">ANUU</span>
+        <p class="story-text">
+          You hold a place so profound and unique that no one—not in the distant past, the present moment, or any endless future—could ever reach or claim it.
+        </p>
+      </div>
+
+      <div class="panel" id="panel-4" style="transform: translate(-50%, -50%) translateZ(-4500px);">
+        <p class="story-text" style="font-size: 1.4rem;">
+          You're the steady light in my chaos, the heartbeat of what matters most. Irreplaceable in ways that touch my soul deeply every single day...
+        </p>
+        <p class="micro-text" style="margin-top: 40px; color: #b066ff;">Making every step feel complete.</p>
+      </div>
+
+      <div class="artifact-container">
+        <div class="glass-artifact"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /* === THE LERP ENGINE (Linear Interpolation) === */
+    // This script calculates the physical scroll physics to make the movement feel heavy and expensive.
+    
+    const camera = document.getElementById('camera');
+    const panels = document.querySelectorAll('.panel');
+    
+    let currentZ = 0;
+    let targetZ = 0;
+    
+    // The deeper the user scrolls, the further forward the camera moves into the Z-axis
+    window.addEventListener('scroll', () => {
+      // Multiply scrollY to control how fast the user flies through the tunnel
+      targetZ = window.scrollY * 1.5; 
+    });
+
+    function render3DEnvironment() {
+      // Math: Smoothly close the gap between current camera position and target scroll position
+      currentZ += (targetZ - currentZ) * 0.08; 
+      
+      // Move the entire camera container forward
+      camera.style.transform = `translateZ(${currentZ}px)`;
+
+      // Logic: Fade text in and out based on its distance from the camera
+      panels.forEach((panel) => {
+        // Extract the exact Z position of this specific panel from its inline CSS
+        const panelZStr = panel.style.transform.match(/translateZ\(([-\d]+)px\)/);
+        if (panelZStr) {
+          const panelZ = parseInt(panelZStr[1]);
+          
+          // Calculate the true distance between the camera and the panel
+          // (currentZ is positive moving forward, panelZ is negative sitting in the distance)
+          const distance = currentZ + panelZ;
+
+          // If the panel is way far back, invisible. 
+          // If it approaches the camera (distance > -800), fade it in.
+          // If it passes behind the camera (distance > 200), fade it out fast.
+          if (distance > 200) {
+            panel.style.opacity = 0;
+          } else if (distance > -800) {
+            // Calculate a clean opacity curve
+            let opacity = 1 - Math.abs(distance) / 800;
+            panel.style.opacity = Math.max(0, Math.min(1, opacity));
+          } else {
+            panel.style.opacity = 0;
+          }
+        }
+      });
+
+      // Run engine at monitor refresh rate
+      requestAnimationFrame(render3DEnvironment);
+    }
+
+    // Initialize Engine
+    render3DEnvironment();
+  </script>
+</body>
+</html>
